@@ -1,5 +1,5 @@
 from typing import Dict
-
+import toolz as t
 import pytest
 from app.db.models import Device, ConnectRelation, Location
 from app.service.service_phone_route import from_json_to_device, from_json_to_connect_relation, from_json_to_location, \
@@ -7,7 +7,7 @@ from app.service.service_phone_route import from_json_to_device, from_json_to_co
 
 
 @pytest.fixture(scope="module")
-def json():
+def phone_call():
     return {
         "devices": [
             {
@@ -50,19 +50,21 @@ def json():
     }
 
 
-def test_from_json_to_device(json):
-    result = from_json_to_device(json["devices"][0])
+def test_from_json_to_device(phone_call):
+    result = from_json_to_device(t.get_in(["devices", 0], phone_call))
     assert isinstance(result, Device)
 
-def test_from_json_to_connect_relation(json):
-    result = from_json_to_connect_relation(json["interaction"])
+
+def test_from_json_to_connect_relation(phone_call):
+    result = from_json_to_connect_relation(phone_call.get("interaction"))
     assert isinstance(result, ConnectRelation)
 
 
-def test_from_json_to_location(json):
-    result = from_json_to_location(json["devices"][0]["location"])
+def test_from_json_to_location(phone_call):
+    result = from_json_to_location(t.get_in(["devices", 0, "location"], phone_call))
     assert isinstance(result, Location)
 
-def test_from_json_to_models(json):
-    result = from_json_to_models(json)
+
+def test_from_json_to_models(phone_call):
+    result = from_json_to_models(phone_call)
     assert isinstance(result, Dict)
