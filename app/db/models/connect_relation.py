@@ -5,6 +5,7 @@ from typing import Optional
 
 @dataclass
 class ConnectRelation:
+
     from_device: str
     to_device: str
     method: str
