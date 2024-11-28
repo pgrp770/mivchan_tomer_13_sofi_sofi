@@ -13,5 +13,5 @@ class ConnectRelation:
     signal_strength_dbm: float
     distance_meters: float
     duration_seconds: float
-    timestamp: datetime
-    uuid: Optional[str] = None
+    timestamp: str
+
