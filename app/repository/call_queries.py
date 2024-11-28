@@ -30,9 +30,15 @@ connect_devices_query = """
                    """
 
 get_bluetooth_connection_query = '''
-                    MATCH path = (a:Device)-[r:CALLED_TO*]->(b:Device)
-                    WHERE ALL(rel IN relationships(path) WHERE rel.method = 'Bluetooth')
-                    RETURN path, length(path)
+                    MATCH (start:Device)
+                    MATCH (end:Device)
+                    WHERE start <> end
+                    MATCH path = shortestPath((start)-[:CALLED_TO*]->(end))
+                    WHERE ALL(r IN relationships(path) WHERE r.method = 'Bluetooth')
+                    WITH path, length(path) as pathLength
+                    ORDER BY pathLength DESC
+                    LIMIT 1
+                    RETURN path
             '''
 
 devices_stronger_than_60_query = '''
@@ -53,7 +59,7 @@ get_direct_connection_query = '''
                     return d1, rel, d2
             '''
 
-latest_timestamp_query =  '''
+latest_timestamp_query = '''
                     match (d1) -[rel:CALLED_TO] - (d2)
                     where d1.uuid = $id_1 and d2.uuid= $id_2
                     RETURN max(rel.timestamp)

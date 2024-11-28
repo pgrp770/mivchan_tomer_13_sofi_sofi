@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from app.repository.call_repository import get_all_bluetooth_connection, \
     get_all_devices_with_signal_stronger_than_60, get_latest_timestamp_relation
 from app.service.service_phone_route import is_there_connection, insert_phone_call_to_neo4j, \
-    get_amount_of_connected_devices
+    get_amount_of_connected_devices, is_the_same_person
 
 phone_blueprint = Blueprint("phone_tracker", __name__)
 
@@ -10,6 +10,10 @@ phone_blueprint = Blueprint("phone_tracker", __name__)
 @phone_blueprint.route("/", methods=['POST'])
 def get_interaction():
     phone_call = request.json
+
+    if is_the_same_person(phone_call):
+        return jsonify({"message": "you mustn't to call to your self."}), 400
+
     insert_phone_call_to_neo4j(phone_call)
     return jsonify({"message": "the phone_call was inserted to neo4j"}), 200
 

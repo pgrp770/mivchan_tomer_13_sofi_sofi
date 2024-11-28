@@ -60,6 +60,12 @@ def from_json_to_models(json: dict) -> Dict:
     return full_phone_call
 
 
+def is_the_same_person(phone_call: dict) -> bool:
+    device_1: Device = t.get_in(["device_1", "device"], from_json_to_models(phone_call))
+    device_2: Device = t.get_in(["device_2", "device"], from_json_to_models(phone_call))
+    return device_1.uuid == device_2.uuid
+
+
 def insert_phone_call_to_neo4j(phone_call):
     create_device(
         t.get_in(["device_1", "device"], from_json_to_models(phone_call)),
