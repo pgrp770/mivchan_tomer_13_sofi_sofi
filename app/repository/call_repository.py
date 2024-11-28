@@ -4,44 +4,6 @@ from app.db.database import driver
 from app.db.models import Device, ConnectRelation, Location
 import toolz as t
 
-'''
-phone_call = {
-        "device_1": device, location
-        "device_2": device, location
-        "connection": connection
-    }
-'''
-
-
-# def create_phone_call(phone_call: Dict):
-#     device_1: Device = phone_call["device_1"]["device"]
-#     location_1: Location = phone_call["device_1"]["location"]
-#
-#     device_2: Device = phone_call["device_2"]["device"]
-#     location_2: Location = phone_call["device_2"]["location"]
-#
-#     connection: ConnectRelation = phone_call["connection"]
-#
-#
-#     with driver.session() as session:
-#         query = """
-#         MERGE (d1:Device{
-#             name: $name
-#             brand: $brand
-#             model: $model
-#             os: $os
-#             uuid: $uuid
-#         })
-#         MERGE (d2:Device{
-#             name: $name
-#             brand: $brand
-#             model: $model
-#             os: $os
-#             uuid: $uuid
-#         }
-#
-#         """
-
 
 def create_device(device: Device, location: Location) -> str:
     with driver.session() as session:
@@ -118,6 +80,7 @@ def connect_devices(relation: ConnectRelation):
         except Exception as e:
             print(str(e))
 
+
 def get_all_bluetooth_connection():
     with driver.session() as session:
         try:
@@ -132,9 +95,7 @@ def get_all_bluetooth_connection():
             print(str(e))
 
 
-
 def get_all_devices_with_signal_stronger_than_60():
-
     with driver.session() as session:
         try:
             query = '''
@@ -147,6 +108,7 @@ def get_all_devices_with_signal_stronger_than_60():
         except Exception as e:
             print(str(e))
 
+
 def get_connected_devices_by_id(device_id: str):
     with driver.session() as session:
         try:
@@ -156,13 +118,55 @@ def get_connected_devices_by_id(device_id: str):
                     RETURN d1
             '''
             params = {
-                "id":device_id
+                "id": device_id
             }
             result = session.run(query, params).data()
             return result
         except Exception as e:
             print(str(e))
+
+
+def get_direct_connection(device1_id: str, device2_id: str):
+    with driver.session() as session:
+        try:
+            query = '''
+                    match (d1:Device) -[rel:CALLED_TO]- (d2:Device) 
+                    where d1.uuid = $id_1 and d2.uuid = $id_2
+                    return d1, rel, d2
+            '''
+            params = {
+                "id_1": device1_id,
+                "id_2": device2_id
+            }
+            result = session.run(query, params).data()
+            return result
+        except Exception as e:
+            print(str(e))
+
+
+def get_latest_timestamp_relation(device1_id: str, device2_id: str):
+    with driver.session() as session:
+        try:
+            query = '''
+                    match (d1) -[rel:CALLED_TO] - (d2)
+                    where d1.uuid = $id_1 and d2.uuid= $id_2
+                    RETURN max(rel.timestamp)
+            '''
+            params = {
+                "id_1": device1_id,
+                "id_2": device2_id
+            }
+            result = session.run(query, params).single()
+            return t.pipe(
+                result,
+                dict,
+                itemgetter("max(rel.timestamp)"),
+            )
+        except Exception as e:
+            print(str(e))
+
+
 if __name__ == '__main__':
     # a = ConnectRelation(from_device='c0861948-d81c-4ef8-b4f2-a1e7b107e92b', to_device='56acbf2b-ba5e-487b-a073-28153c381869', method='NFC', bluetooth_version='4.3', signal_strength_dbm=-43, distance_meters=8.08, duration_seconds=32, timestamp='1976-03-14T12:34:04')
     # print(connect_devices(a))
-    print(get_connected_devices_by_id("f6075b12-ed50-4cac-b94a-714b194b7081"))
+    print(get_latest_timestamp_relation("2943920f-bde6-499a-ad07-760d1744dd19", "1086d171-8570-43d6-a1ea-e41cc0440b5e"))

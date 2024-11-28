@@ -1,8 +1,8 @@
 from flask import Blueprint, request, jsonify
 
 from app.repository.call_repository import create_device, connect_devices, get_all_bluetooth_connection, \
-    get_all_devices_with_signal_stronger_than_60
-from app.service.service_phone_route import from_json_to_models, from_json_to_connect_relation
+    get_all_devices_with_signal_stronger_than_60, get_connected_devices_by_id, get_latest_timestamp_relation
+from app.service.service_phone_route import from_json_to_models, from_json_to_connect_relation, is_there_connection
 
 phone_blueprint = Blueprint("phone_tracker", __name__)
 
@@ -30,3 +30,23 @@ def get_bluetooth_connection_endpoint():
 def get_all_devices_with_signal_stronger_than_60_endpoint():
     result = get_all_devices_with_signal_stronger_than_60()
     return jsonify(result), 200
+
+
+@phone_blueprint.route("/connected_devices/<string:device_id>", methods=["GET"])
+def get_connected_devices(device_id):
+    result = get_connected_devices_by_id(device_id)
+    return jsonify(result), 200
+
+
+@phone_blueprint.route("/check_connection/<string:device_id_1>/<string:device_id_2>", methods=["GET"])
+def check_connection(device_id_1: str, device_id_2: str):
+    result = is_there_connection(device_id_1, device_id_2)
+    return jsonify(result), 200
+
+
+@phone_blueprint.route("/latest_call/<string:device_id_1>/<string:device_id_2>", methods=["GET"])
+def latest_call(device_id_1: str, device_id_2: str):
+    result = get_latest_timestamp_relation(device_id_1, device_id_2)
+    if not result:
+        return jsonify(({"message": "there is not calls between those devices"})), 200
+    return jsonify({"latest_call": result}), 200
