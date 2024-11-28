@@ -11,7 +11,7 @@ phone_blueprint = Blueprint("phone_tracker", __name__)
 def get_interaction():
     phone_call = request.json
     insert_phone_call_to_neo4j(phone_call)
-    return jsonify({"message: the phone_call was inserted to neo4j"}), 200
+    return jsonify({"message": "the phone_call was inserted to neo4j"}), 200
 
 
 @phone_blueprint.route("/bluetooth_connection", methods=["GET"])
