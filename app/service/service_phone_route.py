@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 import toolz as t
 
 from app.db.models import Device, ConnectRelation, Location
@@ -40,16 +40,20 @@ def from_json_to_location(location: dict) -> Location:
 
 
 def from_json_to_device_and_location(device):
-    return [from_json_to_device(device), from_json_to_location(device["location"])]
+    return {"device":from_json_to_device(device), "location":from_json_to_location(device["location"])}
 
 
-def from_json_to_models(json: dict) -> List:
+def from_json_to_models(json: dict) -> Dict:
     devices = t.pipe(
         json["devices"],
         t.partial(map, from_json_to_device_and_location),
         list
     )
     connection = from_json_to_connect_relation(json["interaction"])
-    full_phone_call =  devices + [connection]
+    full_phone_call = {
+        "device_1": devices[0],
+        "device_2": devices[1],
+        "connection": connection
+    }
     print(full_phone_call)
     return full_phone_call

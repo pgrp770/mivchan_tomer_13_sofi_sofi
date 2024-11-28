@@ -8,4 +8,3 @@ class Location:
     longitude: float
     altitude_meters: float
     accuracy_meters: float
-    uuid: Optional[str] = None

@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict
 
 import pytest
 from app.db.models import Device, ConnectRelation, Location
@@ -65,4 +65,4 @@ def test_from_json_to_location(json):
 
 def test_from_json_to_models(json):
     result = from_json_to_models(json)
-    assert isinstance(result, List)
+    assert isinstance(result, Dict)
