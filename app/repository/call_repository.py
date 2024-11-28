@@ -118,7 +118,51 @@ def connect_devices(relation: ConnectRelation):
         except Exception as e:
             print(str(e))
 
-#
+def get_all_bluetooth_connection():
+    with driver.session() as session:
+        try:
+            query = '''
+                    MATCH path = (a:Device)-[r:CALLED_TO*]->(b:Device)
+                    WHERE ALL(rel IN relationships(path) WHERE rel.method = 'Bluetooth')
+                    RETURN path, length(path)
+            '''
+            result = session.run(query).data()
+            return result
+        except Exception as e:
+            print(str(e))
+
+
+
+def get_all_devices_with_signal_stronger_than_60():
+
+    with driver.session() as session:
+        try:
+            query = '''
+                    MATCH (d1:Device) -[rel:CALLED_TO]->(d2:Device)
+                    WHERE rel.signal_strength_dbm > -60
+                    RETURN d1
+            '''
+            result = session.run(query).data()
+            return result
+        except Exception as e:
+            print(str(e))
+
+def get_connected_devices_by_id(device_id: str):
+    with driver.session() as session:
+        try:
+            query = '''
+                    MATCH (d1:Device) -[rel:CALLED_TO]->(d2:Device)
+                    WHERE d2.uuid = $id
+                    RETURN d1
+            '''
+            params = {
+                "id":device_id
+            }
+            result = session.run(query, params).data()
+            return result
+        except Exception as e:
+            print(str(e))
 if __name__ == '__main__':
-    a = ConnectRelation(from_device='c0861948-d81c-4ef8-b4f2-a1e7b107e92b', to_device='56acbf2b-ba5e-487b-a073-28153c381869', method='NFC', bluetooth_version='4.3', signal_strength_dbm=-43, distance_meters=8.08, duration_seconds=32, timestamp='1976-03-14T12:34:04')
-    print(connect_devices(a))
+    # a = ConnectRelation(from_device='c0861948-d81c-4ef8-b4f2-a1e7b107e92b', to_device='56acbf2b-ba5e-487b-a073-28153c381869', method='NFC', bluetooth_version='4.3', signal_strength_dbm=-43, distance_meters=8.08, duration_seconds=32, timestamp='1976-03-14T12:34:04')
+    # print(connect_devices(a))
+    print(get_connected_devices_by_id("f6075b12-ed50-4cac-b94a-714b194b7081"))
