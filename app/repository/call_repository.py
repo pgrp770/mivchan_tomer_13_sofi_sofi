@@ -34,6 +34,7 @@ def create_device(device: Device, location: Location) -> str:
             "accuracy_meters": location.accuracy_meters
         }
         result = session.run(query, params).single()
+        print(f"device with id {device.uuid} was created")
         return t.pipe(
             result,
             dict,
@@ -70,7 +71,7 @@ def connect_devices(relation: ConnectRelation):
                 "timestamp": relation.timestamp
             }
             result = session.run(query, params).single()
-
+            print(f"connection from {relation.from_device} to {relation.to_device} was created")
             return t.pipe(
                 result,
                 dict,

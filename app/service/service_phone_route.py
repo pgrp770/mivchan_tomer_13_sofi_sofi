@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import Dict
 import toolz as t
 
 from app.db.models import Device, ConnectRelation, Location
@@ -41,7 +41,7 @@ def from_json_to_location(location: dict) -> Location:
 
 
 def from_json_to_device_and_location(device) -> Dict:
-    return {"device":from_json_to_device(device), "location":from_json_to_location(device["location"])}
+    return {"device": from_json_to_device(device), "location": from_json_to_location(device["location"])}
 
 
 def from_json_to_models(json: dict) -> Dict:
@@ -56,7 +56,6 @@ def from_json_to_models(json: dict) -> Dict:
         "device_2": devices[1],
         "connection": connection
     }
-    print(full_phone_call)
     return full_phone_call
 
 
@@ -64,6 +63,6 @@ def is_there_connection(d_1, d_2):
     result = get_direct_connection(d_1, d_2)
     return True if result else False
 
-if __name__ == '__main__':
 
+if __name__ == '__main__':
     print(is_there_connection("3be88873-56bb-432c-8f143132589348c", "2548e070-a8ca-474c-87ae-88f3756e4fe6"))
