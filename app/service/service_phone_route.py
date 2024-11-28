@@ -2,7 +2,8 @@ from typing import Dict
 import toolz as t
 
 from app.db.models import Device, ConnectRelation, Location
-from app.repository.call_repository import get_direct_connection
+from app.repository.call_repository import get_direct_connection, create_device, connect_devices, \
+    get_connected_devices_by_id
 
 
 def from_json_to_device(device: dict) -> Device:
@@ -57,6 +58,25 @@ def from_json_to_models(json: dict) -> Dict:
         "connection": connection
     }
     return full_phone_call
+
+
+def insert_phone_call_to_neo4j(phone_call):
+    create_device(
+        t.get_in(["device_1", "device"], from_json_to_models(phone_call)),
+        t.get_in(["device_1", "location"], from_json_to_models(phone_call))
+    )
+
+    create_device(
+        t.get_in(["device_2", "device"], from_json_to_models(phone_call)),
+        t.get_in(["device_2", "location"], from_json_to_models(phone_call))
+    )
+    connect_devices(
+        from_json_to_connect_relation(phone_call.get("interaction"))
+    )
+
+
+def get_amount_of_connected_devices(device_id: str):
+    return len(get_connected_devices_by_id(device_id))
 
 
 def is_there_connection(d_1, d_2):
