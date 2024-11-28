@@ -42,9 +42,9 @@ def check_connection(device_id_1: str, device_id_2: str):
     return jsonify({"there_is_connection": result}), 200
 
 
-@phone_blueprint.route("/latest_call/<string:device_id_1>/<string:device_id_2>", methods=["GET"])
-def latest_call(device_id_1: str, device_id_2: str):
-    result = get_latest_timestamp_relation(device_id_1, device_id_2)
+@phone_blueprint.route("/latest_call/<string:device_id>", methods=["GET"])
+def latest_call(device_id: str):
+    result = get_latest_timestamp_relation(device_id)
 
     if not result:
         return jsonify(({"message": "there is not calls between those devices"})), 200

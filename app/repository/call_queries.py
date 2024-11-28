@@ -61,6 +61,6 @@ get_direct_connection_query = '''
 
 latest_timestamp_query = '''
                     match (d1) -[rel:CALLED_TO] - (d2)
-                    where d1.uuid = $id_1 and d2.uuid= $id_2
+                    where d1.uuid = $id
                     RETURN max(rel.timestamp)
             '''

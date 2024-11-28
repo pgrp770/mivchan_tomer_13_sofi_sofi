@@ -105,13 +105,12 @@ def get_direct_connection(device1_id: str, device2_id: str):
             print(str(e))
 
 
-def get_latest_timestamp_relation(device1_id: str, device2_id: str):
+def get_latest_timestamp_relation(device_id: str):
     with driver.session() as session:
         try:
             query = latest_timestamp_query
             params = {
-                "id_1": device1_id,
-                "id_2": device2_id
+                "id": device_id
             }
             result = session.run(query, params).single()
             return t.pipe(
