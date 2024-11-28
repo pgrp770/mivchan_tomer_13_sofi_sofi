@@ -1,17 +1,17 @@
 insert_call_query = """
-        MERGE (d:Device{
-            uuid: $uuid,
-            name: $name,
-            brand: $brand,
-            model: $model,
-            os: $os,
-            latitude:$latitude,
-            longitude:$longitude,
-            altitude_meters:$altitude_meters,
-            accuracy_meters:$accuracy_meters      
-        })
-        RETURN d.uuid AS id
-        """
+                    MERGE (d:Device{
+                        uuid: $uuid,
+                        name: $name,
+                        brand: $brand,
+                        model: $model,
+                        os: $os,
+                        latitude:$latitude,
+                        longitude:$longitude,
+                        altitude_meters:$altitude_meters,
+                        accuracy_meters:$accuracy_meters      
+                    })
+                    RETURN d.uuid AS id
+            """
 
 connect_devices_query = """
                     MATCH
@@ -27,7 +27,7 @@ connect_devices_query = """
 
                    }] -> (d2)
                    RETURN rel
-                   """
+           """
 
 get_bluetooth_connection_query = '''
                     MATCH (start:Device)
