@@ -14,6 +14,7 @@ def from_json_to_device(device: dict) -> Device:
         "model": device["model"],
         "os": device["os"]
     }
+
     return Device(**new_device)
 
 
@@ -28,6 +29,7 @@ def from_json_to_connect_relation(relation: dict) -> ConnectRelation:
         "duration_seconds": relation["duration_seconds"],
         "timestamp": relation["timestamp"]
     }
+
     return ConnectRelation(**new_relation)
 
 
@@ -38,6 +40,7 @@ def from_json_to_location(location: dict) -> Location:
         "altitude_meters": location["altitude_meters"],
         "accuracy_meters": location["accuracy_meters"]
     }
+
     return Location(**new_location)
 
 
@@ -51,18 +54,22 @@ def from_json_to_models(json: dict) -> Dict:
         t.partial(map, from_json_to_device_and_location),
         list
     )
+
     connection = from_json_to_connect_relation(json["interaction"])
+
     full_phone_call = {
         "device_1": devices[0],
         "device_2": devices[1],
         "connection": connection
     }
+
     return full_phone_call
 
 
 def is_the_same_person(phone_call: dict) -> bool:
     device_1: Device = t.get_in(["device_1", "device"], from_json_to_models(phone_call))
     device_2: Device = t.get_in(["device_2", "device"], from_json_to_models(phone_call))
+
     return device_1.uuid == device_2.uuid
 
 
@@ -76,6 +83,7 @@ def insert_phone_call_to_neo4j(phone_call):
         t.get_in(["device_2", "device"], from_json_to_models(phone_call)),
         t.get_in(["device_2", "location"], from_json_to_models(phone_call))
     )
+
     connect_devices(
         from_json_to_connect_relation(phone_call.get("interaction"))
     )
@@ -88,7 +96,3 @@ def get_amount_of_connected_devices(device_id: str):
 def is_there_connection(d_1, d_2):
     result = get_direct_connection(d_1, d_2)
     return True if result else False
-
-
-if __name__ == '__main__':
-    print(is_there_connection("3be88873-56bb-432c-8f143132589348c", "2548e070-a8ca-474c-87ae-88f3756e4fe6"))
